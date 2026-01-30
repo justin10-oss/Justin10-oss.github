@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Bark</title>
+</head>
+<body style="background-color: rgb(210, 210, 165); text-align: center; padding: 50px;">
+   <!-- my header -->
+   <h1 style="
+    color: rgb(11, 119, 11); 
+    font-family: Arial, sans-serif; font-size: 60px; 
+ ">
+    Tree Bark is Free here come get yo Bark Bru</h1>
+   
+    <!-- my paragraph -->
+    <p style="color: rgb(14, 143, 78);">Welcome to the Tree Bark page. Here you can find various resources and information about tree bark.
+       and possible buy some bark dude</p>
+   
+    <textarea placeholder="Let me know how your bark was plz"></textarea>
+    <br>
+   
+    <!-- my button -->
+    <button id="button" onclick="alert('Enjoy your tree bark!')" style="color: green; background-color: salmon; border: none; padding: 20px; 
+    display: block; margin: auto; font-size: 16px; cursor: pointer; margin-top: 20px;" >
+    Free Bark</button> 
+    <audio id="hoverSound" src="travis-scott-sound-effect-327016.mp3" preload="auto"></audio>
+      <script>
+         const button = document.getElementById('button');
+         const hoverSound = document.getElementById('hoverSound');
+
+         button.addEventListener('mouseover', () => {
+             hoverSound.play();
+             hoverSound.volume = 0.05;
+         });
+         </script>
+
+    <style>
+    button{
+  width: 100px;
+  transition: transform 0.5s ease;
+}
+button:hover {
+  transform: scale(1.2);
+}
+</style>
+ 
+<!-- button game img-->
+<!-- my image -->
+<div class="image-wrapper">
+  <button class="image-button">
+    <img
+      id="barkImage"
+      class="img-button"
+      src="cribs dent.png"
+      alt="Tree Bark"
+    />
+  </button>
+<p class="score-text">
+  Barks per Second: <span id="bps">1</span>
+</p>
+<!-- score display -->
+<p style="font-size: 24px; font-weight: bold; margin-top: 50px; margin-left: 104px;">
+  Bark Points: <span id="score">0</span>
+</p>
+<button id="upgradeBps" class="upgrade-btn">
+  +1 bps (Cost: 50 Bark Points)
+</button>
+<audio id="clickSound" src="Bonk - Sound Effect (HD) 4.mp3">
+   </audio> 
+</div>
+<!-- styles -->
+<style>
+  .image-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 450px;
+    margin-top: 50px;
+  }
+
+  .image-button {
+    border: none;
+    background: none;
+    padding: 0;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .img-button {
+    width: 350px;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .img-button:hover {
+    opacity: 0.9;
+  }
+    .score-text {
+    margin-top: 35px;
+    display: flex;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(11, 119, 11);
+  }
+    .upgrade-btn {
+    margin-top: 10px;
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #8bc34a;
+    color: #103b0f;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+
+  .upgrade-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  .pop {
+    animation: pop 0.15s ease;
+  }
+  @keyframes pop {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .floating-text {
+  position: absolute;
+  color: #000000;
+  font-weight: bold;
+  font-size: 20px;
+  pointer-events: none;
+  animation: floatUp 1s ease-out forwards;
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+body {
+  overscroll-behavior: none;
+}
+</style>
+
+
+<!-- scripts -->
+<script>
+  const barkImage = document.getElementById('barkImage');
+  const scoreDisplay = document.getElementById('score');
+  const bpsDisplay = document.getElementById('bps');
+  const clickSound = document.getElementById('clickSound');
+  const upgradeBtn = document.getElementById('upgradeBps');
+
+  function animateNumber(element, newValue) {
+  const oldValue = parseInt(element.textContent) || 0;
+  const duration = 200;
+  const start = performance.now();
+
+  function update(time) {
+    const progress = Math.min((time - start) / duration, 1);
+    element.textContent = Math.floor(oldValue + (newValue - oldValue) * progress);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+}
+
+  // Load saved values
+  let score = parseInt(localStorage.getItem('barkScore')) || 0;
+  let barksPerSecond = parseInt(localStorage.getItem('barksPerSecond')) || 1;
+  let upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 50;
+
+  // Initial UI
+  animateNumber(scoreDisplay, score);
+  bpsDisplay.textContent = barksPerSecond;
+  upgradeBtn.textContent = `+1 BPS (Cost: ${upgradeCost} Bark)`;
+
+  function updateUpgradeButton() {
+    upgradeBtn.disabled = score < upgradeCost;
+    upgradeBtn.textContent = `+1 BPS (Cost: ${upgradeCost} Bark)`;
+  }
+
+  updateUpgradeButton();
+
+  // CLICK bark
+  barkImage.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); // Prevents default touch behavior
+    score++;
+    localStorage.setItem('barkScore', score);
+    updateUpgradeButton();
+    spawnFloatingText("+1 Bark");
+    animateNumber(scoreDisplay, score);
+
+
+    // Pop animation
+    barkImage.classList.add('pop');
+    setTimeout(() => {
+      barkImage.classList.remove('pop');
+    }, 150);
+
+    clickSound.currentTime = 0;
+    clickSound.volume = 0.05;
+    clickSound.play();
+  });
+
+  // PASSIVE bark system
+  setInterval(() => {
+    score += barksPerSecond;
+    animateNumber(scoreDisplay, score);
+    localStorage.setItem('barkScore', score);
+    updateUpgradeButton();
+  }, 1000);
+
+  // UPGRADE BPS
+  upgradeBtn.addEventListener('click', () => {
+    if (score >= upgradeCost) {
+      score -= upgradeCost;
+      barksPerSecond++;
+
+      // Scale cost
+      upgradeCost = Math.floor(upgradeCost * 1.005);
+
+      animateNumber(scoreDisplay, score);
+      bpsDisplay.textContent = barksPerSecond;
+
+      localStorage.setItem('barkScore', score);
+      localStorage.setItem('barksPerSecond', barksPerSecond);
+      localStorage.setItem('upgradeCost', upgradeCost);
+
+      updateUpgradeButton();
+    }
+  });
+  // Floating text on click
+  function spawnFloatingText(text) {
+  const floating = document.createElement("div");
+  floating.className = "floating-text";
+  floating.textContent = text;
+
+  const rect = barkImage.getBoundingClientRect();
+  floating.style.left = rect.left + rect.width / 2 - 10 + "px";
+  floating.style.top = rect.top + rect.height / 2 + "px";
+
+  document.body.appendChild(floating);
+
+  setTimeout(() => floating.remove(), 1000);
+}
+</script>
+
+
+  <!-- second image button not sure if i wanna use -->
+<!---
+  <style> button{
+  width: 100px;
+  transition: transform 0.5s ease;
+}
+button:hover {
+  transform: scale(1.2);
+}
+    
+</style>
+  
+  <style>
+  .img-button {
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+   .img-button:hover {
+    transform: scale(1.005);
+    opacity: 0.9;
+  }
+</style>
+<div style="display: flex; justify-content: right; margin-top: 50px;">
+  <button style="border:none; background:none; padding:0;">
+    <img 
+    class="img-button" 
+    src="cribs dent carti edition.png" 
+    style="width:350px; outline: none"/>
+  </button>
+</div>
+-->
+    <!-- my footer -->
+   <h2 style ="color: rgb(11, 119, 11); font-family: Arial, sans-serif; font-size: 60px;">
+    Thank you for visiting our Tree Bark page!
+    Bark is the outermost layer of stems and roots of woody plants. Plants with bark include trees, woody vines, and shrubs. 
+    Bark refers to all the tissues outside the vascular cambium and is a nontechnical term.
+    It overlays the wood and consists of the inner bark and the outer bark. 
+    The inner bark, which in older stems is living tissue, includes the innermost layer of the periderm. 
+    The outer bark on older stems includes the dead tissue on the surface of the stems, 
+    along with parts of the outermost periderm and all the tissues on the outer side of the periderm.
+     The outer bark on trees which lies external to the living periderm is also called the rhytidome
+</h2>
+</body>
+</html>
